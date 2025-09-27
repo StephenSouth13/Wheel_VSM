@@ -1,73 +1,46 @@
-# Welcome to your Lovable project
 
-## Project info
+Vòng Quay May Mắn VSM
+Một ứng dụng web tương tác được phát triển bằng React, Tailwind CSS và Vite, mô phỏng trò chơi vòng quay may mắn kinh điển.
 
-**URL**: https://lovable.dev/projects/9cf4c8b6-3b4b-4601-a51f-b8900e41b3f5
+Tính Năng Nổi Bật
+Thiết kế hiện đại: Giao diện trực quan, đẹp mắt được xây dựng với Tailwind CSS và tối ưu hóa hiệu suất với Vite.
 
-## How can I edit this code?
+Hiệu ứng mượt mà: Hiệu ứng quay chân thực và âm thanh sống động, mang lại trải nghiệm kịch tính.
 
-There are several ways of editing your application.
+Tùy chỉnh linh hoạt: Dễ dàng điều chỉnh số lượng ghế và các tùy chọn khác để phù hợp với nhu cầu sử dụng.
 
-**Use Lovable**
+Tương tác âm thanh: Âm thanh phát ra khi quay và khi vòng quay dừng lại, tăng thêm sự hứng thú cho người chơi.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9cf4c8b6-3b4b-4601-a51f-b8900e41b3f5) and start prompting.
+Công Nghệ Sử Dụng
+Frontend: React.js
 
-Changes made via Lovable will be committed automatically to this repo.
+CSS Framework: Tailwind CSS
 
-**Use your preferred IDE**
+Tooling: Vite
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Quản lý gói: PNPM
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Icon: Lucide React
 
-Follow these steps:
+Hướng Dẫn Cài Đặt
+Clone repository:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Bash
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+git clone https://github.com/StephenSouth13/Wheel_VSM.git
+cd Wheel_VSM
+Cài đặt các gói:
+Sử dụng pnpm để cài đặt tất cả các dependencies.
 
-# Step 3: Install the necessary dependencies.
-npm i
+Bash
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+pnpm install
+Chạy dự án ở chế độ phát triển:
 
-**Edit a file directly in GitHub**
+Bash
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+pnpm dev
+Dự án sẽ được chạy trên http://localhost:5173 hoặc một port khác tùy thuộc vào cấu hình của bạn.
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/9cf4c8b6-3b4b-4601-a51f-b8900e41b3f5) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Góp Ý Và Đóng Góp
+Dự án này vẫn đang trong giai đoạn phát triển. Nếu bạn có bất kỳ ý tưởng, góp ý hoặc muốn đóng góp code, vui lòng mở một Issue hoặc tạo một Pull Request.

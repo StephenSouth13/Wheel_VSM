@@ -216,10 +216,8 @@ export const SpinningWheel: React.FC = () => {
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/20 to-orange-500/20 blur-xl scale-110"></div>
           
           {/* Pointer */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-6 z-30">
-            <div className="relative">
-              <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-b-[40px] border-l-transparent border-r-transparent border-b-yellow-400 drop-shadow-2xl"></div>
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-3 h-6 bg-yellow-400 rounded-full"></div>
+<div className="absolute top-0 left-[48%] transform -translate-x-1/2 -translate-y-6 z-30">            <div className="relative">
+<div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[40px] border-l-transparent border-r-transparent border-t-yellow-400 drop-shadow-2xl"></div>              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-3 h-6 bg-yellow-400 rounded-full"></div>
             </div>
           </div>
 

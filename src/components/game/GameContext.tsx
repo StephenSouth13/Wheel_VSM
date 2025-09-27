@@ -6,6 +6,7 @@ export interface Question {
   options: string[];
   correct: number;
   explanation: string;
+  type?: string; // Add this line
 }
 
 interface GameState {
@@ -38,73 +39,77 @@ type GameAction =
 const gameQuestions: Question[] = [
   {
     id: 1,
-    question: 'Tên gọi chính thức của cuộc thi chạy có quãng đường 42,195 km là gì?',
-    options: ['Half Marathon', 'Marathon', 'Ultra Marathon', 'Sprint Marathon'],
+    question: '“Willpower” trong cụm từ Willpower Generation có nghĩa là gì?',
+    options: ['Tài năng bẩm sinh', 'Ý chí – nghị lực', 'May mắn', 'Sức mạnh cơ bắp'],
     correct: 1,
-    explanation: 'Marathon là tên gọi chính thức của cuộc thi chạy 42,195 km, có nguồn gốc từ trận Marathon ở Hy Lạp cổ đại.'
+    explanation: 'Willpower có nghĩa là ý chí hay nghị lực, sức mạnh tinh thần giúp vượt qua khó khăn.'
   },
   {
     id: 2,
-    question: 'Khởi động trước khi chạy có tác dụng chính là gì?',
-    options: ['Tăng sức bền', 'Giúp giảm cân', 'Giảm nguy cơ chấn thương', 'Tăng tốc độ'],
-    correct: 2,
-    explanation: 'Khởi động giúp làm ấm cơ bắp, tăng lưu lượng máu và chuẩn bị cơ thể cho hoạt động, từ đó giảm nguy cơ chấn thương.'
+    question: 'VSM là viết tắt của cụm từ nào?',
+    options: ['Vietnam Student Marathon', 'Vietnam Sports Marathon', 'Viet Student Movement', 'Viet Spirit Marathon'],
+    correct: 0,
+    explanation: 'VSM là viết tắt của Vietnam Student Marathon, cuộc thi chạy dành cho sinh viên Việt Nam.'
   },
   {
     id: 3,
-    question: 'Loại chấn thương phổ biến nhất mà người chạy bộ hay gặp phải là gì?',
-    options: ['Chấn thương cổ tay', 'Đau đầu gối (Runner\'s Knee)', 'Đau lưng', 'Chấn thương vai'],
-    correct: 1,
-    explanation: 'Đau đầu gối (Runner\'s Knee) là chấn thương phổ biến nhất do tác động lặp lại và áp lực lên khớp gối khi chạy.'
+    question: 'Câu nói nào sau đây truyền cảm hứng về ý chí vượt khó?',
+    options: ['“Ý chí mạnh mẽ có thể biến điều không thể thành có thể.”', '“Chỉ cần may mắn là đủ để thành công.”', '“Đừng làm gì cả, mọi thứ sẽ tự đến.”', '“Thử thách càng ít càng dễ thành công.”'],
+    correct: 0,
+    explanation: 'Câu nói "Ý chí mạnh mẽ..." nhấn mạnh vai trò của ý chí trong việc biến những mục tiêu khó khăn thành hiện thực.'
   },
   {
     id: 4,
-    question: 'Thời gian tốt nhất để nạp năng lượng sau khi chạy là trong khoảng thời gian nào?',
-    options: ['Ngay lập tức', 'Sau 2 giờ', '30 phút đầu tiên', 'Sau 4 giờ'],
-    correct: 2,
-    explanation: 'Trong 30 phút đầu sau khi tập luyện là "cửa sổ vàng" để cơ thể hấp thụ dinh dưỡng và phục hồi hiệu quả nhất.'
+    question: 'Theo bạn, điều gì giúp sinh viên rèn luyện ý chí tốt nhất?',
+    options: ['Chạy bộ và thể thao', 'Học tập – vượt qua deadline', 'Tham gia hoạt động cộng đồng', 'Tất cả các đáp án trên'],
+    correct: 3,
+    explanation: 'Tất cả các hoạt động trên đều giúp sinh viên rèn luyện ý chí, từ sự kiên trì trong thể thao, kỷ luật trong học tập, đến tinh thần trách nhiệm trong cộng đồng.'
   },
   {
     id: 5,
-    question: 'Biểu hiện của "chuột rút" là gì?',
-    options: ['Cảm giác châm chích ở chân', 'Buồn nôn', 'Co thắt cơ đột ngột', 'Hoa mắt'],
-    correct: 2,
-    explanation: 'Chuột rút là hiện tượng co thắt cơ đột ngột và không kiểm soát được, thường do mệt mỏi hoặc mất nước điện giải.'
+    question: 'Tinh thần “Willpower Generation” hướng sinh viên tới điều gì?',
+    options: ['Lối sống lành mạnh, kỷ luật và vượt giới hạn bản thân', 'Nghỉ ngơi nhiều hơn, ít thử thách hơn', 'Chỉ tập trung vào giải trí', 'Không cần rèn luyện'],
+    correct: 0,
+    explanation: 'Tinh thần "Willpower Generation" khuyến khích sinh viên sống có kỷ luật, lành mạnh và không ngừng vượt qua giới hạn của bản thân.'
   },
   {
     id: 6,
-    question: 'Đôi giày chuyên dụng cho chạy bộ có đặc điểm gì nổi bật?',
-    options: ['Cứng và nhẹ', 'Có độ đàn hồi và đệm tốt', 'Lớp đế mỏng', 'Bề mặt nhẵn'],
+    question: 'Khẩu hiệu chính của VSM 2025 là gì?',
+    options: ['“Chạy vì sức khỏe”', '“Chạy vì tương lai”', '“Chạy vì niềm vui”', 'Tất cả đều sai'],
     correct: 1,
-    explanation: 'Giày chạy bộ cần có độ đàn hồi và đệm tốt để hấp thụ lực tác động, bảo vệ khớp và giảm chấn thương.'
+    explanation: 'Khẩu hiệu chính của VSM 2025 là "Chạy vì tương lai", nhằm kêu gọi sinh viên rèn luyện sức bền và ý chí cho một tương lai tốt đẹp.'
   },
   {
     id: 7,
-    question: 'Mục đích của việc hít thở bằng bụng khi chạy là gì?',
-    options: ['Giảm đau', 'Tăng hiệu quả hô hấp', 'Giúp cơ bắp săn chắc', 'Giảm mệt mỏi'],
-    correct: 1,
-    explanation: 'Hít thở bằng bụng (cơ hoành) giúp tăng dung tích phổi, cung cấp oxy hiệu quả hơn so với thở ngực.'
+    question: 'Yếu tố nào dưới đây KHÔNG giúp rèn luyện ý chí bền bỉ?',
+    options: ['Lập mục tiêu rõ ràng', 'Duy trì kỷ luật cá nhân', 'Thường xuyên bỏ dở giữa chừng', 'Biến thất bại thành bài học'],
+    correct: 2,
+    explanation: 'Việc "thường xuyên bỏ dở giữa chừng" là yếu tố phá vỡ ý chí và sự bền bỉ, trái ngược với việc rèn luyện.'
   },
+  // 3 câu tự luận (essay)
   {
     id: 8,
-    question: 'Tại sao không nên chạy quá sức khi mới bắt đầu?',
-    options: ['Gây lãng phí năng lượng', 'Dễ dẫn đến chấn thương và nản chí', 'Giảm tốc độ', 'Giảm khả năng đốt mỡ'],
-    correct: 1,
-    explanation: 'Chạy quá sức khi mới bắt đầu có thể gây chấn thương do cơ thể chưa thích nghi, và tạo cảm giác nản chí, bỏ cuộc.'
+    question: 'Một thói quen nhỏ nào bạn đang duy trì mỗi ngày để rèn luyện sự bền bỉ? (Tự luận)',
+    options: [], // Không có options cho câu hỏi tự luận
+    correct: -1, // Giá trị đặc biệt để đánh dấu không có đáp án trắc nghiệm
+    explanation: 'Câu trả lời tự luận, không có đáp án đúng/sai cụ thể.',
+    type: 'essay' // Thêm thuộc tính này để phân biệt
   },
   {
     id: 9,
-    question: 'Tên tiếng Anh của môn chạy bộ là gì?',
-    options: ['Walking', 'Swimming', 'Running', 'Cycling'],
-    correct: 2,
-    explanation: 'Running là thuật ngữ tiếng Anh chính xác cho môn chạy bộ, khác với Walking (đi bộ).'
+    question: 'Nếu phải chọn một câu nói truyền cảm hứng về ý chí để nhắc nhở bản thân, bạn sẽ chọn câu nào? (Tự luận)',
+    options: [],
+    correct: -1,
+    explanation: 'Câu trả lời tự luận, không có đáp án đúng/sai cụ thể.',
+    type: 'essay'
   },
   {
     id: 10,
-    question: 'Tác dụng của việc bổ sung nước điện giải khi chạy là gì?',
-    options: ['Hỗ trợ tiêu hóa', 'Bù nước và khoáng chất bị mất', 'Tăng tốc độ', 'Giảm cân nhanh hơn'],
-    correct: 1,
-    explanation: 'Nước điện giải giúp bù đắp nước và các khoáng chất (natri, kali) bị mất qua mồ hôi khi chạy.'
+    question: 'Khi đối mặt với thất bại, bạn thường làm gì để lấy lại tinh thần và bước tiếp? (Tự luận)',
+    options: [],
+    correct: -1,
+    explanation: 'Câu trả lời tự luận, không có đáp án đúng/sai cụ thể.',
+    type: 'essay'
   }
 ];
 
@@ -119,12 +124,11 @@ const initialState: GameState = {
   playerAttempts: 0,
   showResult: false,
   lastAnswer: null,
-  timeLimit: 15,
+  timeLimit: 15, // Thời gian mặc định
   maxSeats: 60
 };
 
 const gameReducer = (state: GameState, action: GameAction): GameState => {
-  // Safety check to ensure state is properly initialized
   if (!state || !state.selectedQuestions) {
     console.error('State is corrupted, reinitializing...', state);
     return initialState;
@@ -142,13 +146,22 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     case 'START_QUESTION':
       const startQuestionId = action.payload.id;
       const attempts = state.questionAttempts[startQuestionId] || 0;
+      let newTimeLimit = 15; // Thời gian mặc định cho câu trắc nghiệm
+
+      // Thiết lập thời gian đặc biệt cho câu hỏi tự luận và lần thử lại
+      if (action.payload.type === 'essay') {
+        newTimeLimit = 90; // 1 phút 30 giây
+      } else if (attempts > 0) {
+        newTimeLimit = 10; // 10 giây cho lần thử lại
+      }
+
       return {
         ...state,
         currentQuestion: action.payload,
         playerAttempts: 0,
         showResult: false,
         lastAnswer: null,
-        timeLimit: attempts > 0 ? 10 : 15 // Reduced time for retry
+        timeLimit: newTimeLimit
       };
     
     case 'ANSWER_QUESTION':
@@ -187,7 +200,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         ...state,
         maxSeats: action.payload,
         availableSeats: Array.from({ length: action.payload }, (_, i) => i + 1),
-        selectedQuestions: state.selectedQuestions || [] // Ensure array exists
+        selectedQuestions: state.selectedQuestions || []
       };
     
     case 'START_GAME':
@@ -204,7 +217,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         playerAttempts: 0,
         showResult: false,
         lastAnswer: null,
-        timeLimit: 15
+        timeLimit: 15 // Đảm bảo thời gian được reset về mặc định
       };
     
     case 'SHOW_RESULT':

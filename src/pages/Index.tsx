@@ -23,10 +23,10 @@ const Index = () => {
         {/* Header */}
         <header className="relative z-10 text-center py-8">
           <h1 className="text-6xl font-bold text-game-white mb-2 drop-shadow-lg">
-            Chạy Bộ Với Trái Tim
+            VSM Talkshow #01
           </h1>
           <p className="text-xl text-muted-foreground font-['Montserrat',sans-serif]">
-            Talkshow Mini Game - Vòng Quay May Mắn
+            Willpower Generation
           </p>
         </header>
 
@@ -42,7 +42,7 @@ const Index = () => {
         {/* Footer */}
         <footer className="relative z-10 text-center py-4 text-muted-foreground">
           <p className="font-['Montserrat',sans-serif]">
-            © 2024 Chạy Bộ Với Trái Tim Talkshow
+            © 2025 VSM TalkShow. All rights reserved.
           </p>
         </footer>
       </div>

@@ -58,7 +58,7 @@ const gameQuestions: Question[] = [
     correct: 0,
     explanation: 'Câu nói "Ý chí mạnh mẽ..." nhấn mạnh vai trò của ý chí trong việc biến những mục tiêu khó khăn thành hiện thực.'
   },
-  {
+  { 
     id: 4,
     question: 'Theo bạn, điều gì giúp sinh viên rèn luyện ý chí tốt nhất?',
     options: ['Chạy bộ và thể thao', 'Học tập – vượt qua deadline', 'Tham gia hoạt động cộng đồng', 'Tất cả các đáp án trên'],

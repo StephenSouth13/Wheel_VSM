@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useState, useEffect, useCallback } from 'react';
+
+// --- I. TYPES AND DATA ---
 
 export interface Question {
-  id: number;  
+  id: number;
   question: string;
   options: string[];
   correct: number;
   explanation: string;
-  type?: string; // Add this line
+  type?: string; // Bổ sung type: 'special' cho câu hỏi đặc biệt
 }
 
 interface GameState {
@@ -15,13 +17,13 @@ interface GameState {
   availableSeats: number[];
   questions: Question[];
   selectedQuestions: number[];
-  questionAttempts: Record<number, number>; // Track attempts per question ID
+  questionAttempts: Record<number, number>; 
   currentQuestion: Question | null;
   playerAttempts: number;
   showResult: boolean;
   lastAnswer: 'correct' | 'incorrect' | null;
-  timeLimit: number; // Dynamic time limit
-  maxSeats: number; // Configurable seat limit
+  timeLimit: number; 
+  maxSeats: number; 
 }
 
 type GameAction =
@@ -29,7 +31,6 @@ type GameAction =
   | { type: 'START_QUESTION'; payload: Question }
   | { type: 'ANSWER_QUESTION'; payload: { correct: boolean } }
   | { type: 'RESET_QUESTION' }
-  | { type: 'COMPLETE_QUESTION'; payload: number }
   | { type: 'RETURN_TO_WHEEL' }
   | { type: 'SHOW_RESULT'; payload: boolean }
   | { type: 'RESET_ATTEMPTS' }
@@ -86,30 +87,30 @@ const gameQuestions: Question[] = [
     correct: 2,
     explanation: 'Việc "thường xuyên bỏ dở giữa chừng" là yếu tố phá vỡ ý chí và sự bền bỉ, trái ngược với việc rèn luyện.'
   },
-  // 3 câu tự luận (essay)
+  // Câu 8: Đã chuyển thành trắc nghiệm
   {
     id: 8,
-    question: 'Một thói quen nhỏ nào bạn đang duy trì mỗi ngày để rèn luyện sự bền bỉ? (Tự luận)',
-    options: [], // Không có options cho câu hỏi tự luận
-    correct: -1, // Giá trị đặc biệt để đánh dấu không có đáp án trắc nghiệm
-    explanation: 'Câu trả lời tự luận, không có đáp án đúng/sai cụ thể.',
-    type: 'essay' // Thêm thuộc tính này để phân biệt
+    question: 'Một thói quen nhỏ nào bạn nên duy trì mỗi ngày để rèn luyện sự bền bỉ?',
+    options: ['Ngủ nướng đến trưa', 'Hoàn thành 1 task nhỏ mỗi ngày', 'Ăn uống theo cảm xúc', 'Trì hoãn mọi việc'], 
+    correct: 1, 
+    explanation: 'Hoàn thành một task nhỏ mỗi ngày giúp xây dựng thói quen kỷ luật và bền bỉ.',
   },
+  // Câu 9: Đã chuyển thành trắc nghiệm
   {
     id: 9,
-    question: 'Nếu phải chọn một câu nói truyền cảm hứng về ý chí để nhắc nhở bản thân, bạn sẽ chọn câu nào? (Tự luận)',
-    options: [],
-    correct: -1,
-    explanation: 'Câu trả lời tự luận, không có đáp án đúng/sai cụ thể.',
-    type: 'essay'
+    question: 'Câu nói nào sau đây thể hiện tinh thần "Willpower Generation" tốt nhất?',
+    options: ['"Muộn còn hơn không"', '"Hành động nhỏ tạo nên thay đổi lớn"', '"Chỉ cần tài năng bẩm sinh"', '"Chờ đợi cơ hội lớn"'],
+    correct: 1,
+    explanation: 'Ý chí bền bỉ được xây dựng từ những hành động nhỏ và kiên trì mỗi ngày.',
   },
+  // Câu 10: Câu hỏi Đặc biệt (Special Question)
   {
     id: 10,
-    question: 'Khi đối mặt với thất bại, bạn thường làm gì để lấy lại tinh thần và bước tiếp? (Tự luận)',
-    options: [],
-    correct: -1,
-    explanation: 'Câu trả lời tự luận, không có đáp án đúng/sai cụ thể.',
-    type: 'essay'
+    question: 'KHI ĐỐI MẶT VỚI THẤT BẠI, BẠN NÊN LÀM GÌ ĐỂ LẤY LẠI TINH THẦN VÀ BƯỚC TIẾP?',
+    options: ['Bỏ cuộc ngay lập tức', 'Đổ lỗi cho hoàn cảnh', 'Phân tích thất bại và rút ra bài học', 'Giả vờ như không có chuyện gì'],
+    correct: 2,
+    explanation: 'Cách tốt nhất là đối diện, phân tích nguyên nhân và biến thất bại thành kinh nghiệm quý báu.',
+  
   }
 ];
 
@@ -146,13 +147,13 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
     case 'START_QUESTION':
       const startQuestionId = action.payload.id;
       const attempts = state.questionAttempts[startQuestionId] || 0;
-      let newTimeLimit = 15; // Thời gian mặc định cho câu trắc nghiệm
+      let newTimeLimit = 15; // Mặc định 15 giây
 
-      // Thiết lập thời gian đặc biệt cho câu hỏi tự luận và lần thử lại
-      if (action.payload.type === 'essay') {
-        newTimeLimit = 90; // 1 phút 30 giây
+      // Logic cho Câu hỏi Đặc biệt (ID 10)
+      if (action.payload.type === 'special') {
+        newTimeLimit = 30; // 30 giây cho câu đặc biệt
       } else if (attempts > 0) {
-        newTimeLimit = 10; // 10 giây cho lần thử lại
+        newTimeLimit = 10; // 10 giây cho lần thử lại trắc nghiệm
       }
 
       return {
@@ -161,24 +162,32 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         playerAttempts: 0,
         showResult: false,
         lastAnswer: null,
-        timeLimit: newTimeLimit
+        timeLimit: newTimeLimit // Sử dụng timeLimit mới
       };
     
     case 'ANSWER_QUESTION':
       const newAttempts = state.playerAttempts + 1;
       const answerQuestionId = state.currentQuestion?.id || 0;
       const questionAttempts = state.questionAttempts[answerQuestionId] || 0;
-      
-      return {
-        ...state,
-        playerAttempts: newAttempts,
-        lastAnswer: action.payload.correct ? 'correct' : 'incorrect',
-        showResult: action.payload.correct || newAttempts >= 2,
-        questionAttempts: {
-          ...state.questionAttempts,
-          [answerQuestionId]: questionAttempts + 1
-        }
+      const isCorrect = action.payload.correct;
+
+      let newState = {
+          ...state,
+          playerAttempts: newAttempts,
+          lastAnswer: isCorrect ? 'correct' : 'incorrect' as ('correct' | 'incorrect'),
+          // Kết thúc lượt chơi nếu đúng hoặc đã hết 2 lần thử
+          showResult: isCorrect || newAttempts >= 2, 
+          questionAttempts: {
+              ...state.questionAttempts,
+              [answerQuestionId]: questionAttempts + 1
+          }
       };
+      
+      // Đánh dấu câu hỏi đã hoàn thành nếu trả lời đúng
+      if (isCorrect) {
+          newState.selectedQuestions = [...state.selectedQuestions, answerQuestionId];
+      }
+      return newState;
     
     case 'RESET_QUESTION':
       return {
@@ -189,11 +198,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         timeLimit: 10
       };
     
-    case 'COMPLETE_QUESTION':
-      return {
-        ...state,
-        selectedQuestions: [...(state.selectedQuestions || []), action.payload]
-      };
+    // Đã loại bỏ action 'COMPLETE_QUESTION' vì không còn câu tự luận
     
     case 'SET_MAX_SEATS':
       return {
@@ -217,7 +222,7 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
         playerAttempts: 0,
         showResult: false,
         lastAnswer: null,
-        timeLimit: 15 // Đảm bảo thời gian được reset về mặc định
+        timeLimit: 15 
       };
     
     case 'SHOW_RESULT':
@@ -260,3 +265,317 @@ export const useGame = () => {
   }
   return context;
 };
+
+// --- II. COMPONENTS ---
+
+// Component hiển thị màn hình câu hỏi
+const QuestionScreen: React.FC = () => {
+  const { state, dispatch } = useGame();
+  const currentQuestion = state.currentQuestion;
+  const [timeLeft, setTimeLeft] = useState(state.timeLimit);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  
+  // Chỉ còn trắc nghiệm, nên isAnswered dựa trên showResult
+  const isAnswered = state.showResult; 
+  const isSpecial = currentQuestion?.type === 'special';
+
+
+  // --- Logic Timer ---
+  useEffect(() => {
+    // Reset trạng thái khi câu hỏi thay đổi
+    setTimeLeft(state.timeLimit);
+    setSelectedOption(null);
+
+    if (!currentQuestion || isAnswered) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft(prevTime => {
+        if (prevTime <= 1) {
+          clearInterval(timer);
+          // Hết giờ -> đánh dấu thất bại
+          dispatch({ type: 'SHOW_RESULT', payload: true }); 
+          // Tự động quay lại wheel sau khi hiện kết quả
+          setTimeout(() => dispatch({ type: 'RETURN_TO_WHEEL' }), 3000);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentQuestion, state.timeLimit, isAnswered, dispatch]);
+  
+  // --- Logic Xử lý Trả lời Trắc nghiệm ---
+  const handleAnswer = (index: number) => {
+    if (state.showResult || state.playerAttempts >= 2) return;
+    
+    setSelectedOption(index);
+    const isCorrect = index === currentQuestion!.correct;
+
+    setTimeout(() => {
+        dispatch({ type: 'ANSWER_QUESTION', payload: { correct: isCorrect } });
+        
+        // Nếu đã trả lời đúng, tự động quay lại vòng quay sau 3 giây
+        if (isCorrect) {
+            setTimeout(() => {
+                dispatch({ type: 'RETURN_TO_WHEEL' });
+            }, 3000);
+        }
+        
+    }, 300);
+  };
+
+  if (!currentQuestion) {
+    return (
+      <div className="text-center text-lg text-red-500">
+        Không có câu hỏi nào được chọn.
+      </div>
+    );
+  }
+  
+  // Hiển thị kết quả
+  if (state.showResult) {
+      let resultMessage = "Đã hết thời gian!";
+      let resultClass = "text-red-500";
+      
+      if (state.lastAnswer === 'correct') {
+          resultMessage = "CHÍNH XÁC! Chúc mừng bạn!";
+          resultClass = "text-green-400";
+      } else if (state.playerAttempts >= 2 && state.lastAnswer === 'incorrect') {
+          resultMessage = "HẾT LƯỢT. Rất tiếc, bạn đã hết 2 lần thử.";
+          resultClass = "text-red-500";
+      }
+
+    return (
+      <div className="flex flex-col items-center justify-center h-full bg-gray-800/90 p-12 rounded-2xl shadow-2xl border-4 border-yellow-400/50 animate-fadeIn">
+        <h2 className={`text-4xl font-extrabold ${resultClass} animate-pulse`}>
+          {resultMessage}
+        </h2>
+        <p className="text-xl text-gray-300 mt-4 font-semibold">
+            Đáp án đúng: {currentQuestion.explanation}
+        </p>
+        <p className="text-sm text-gray-400 mt-6">
+            (Tự động chuyển màn hình sau 3 giây)
+        </p>
+      </div>
+    );
+  }
+  
+  const formattedTime = `${Math.floor(timeLeft / 60)}:${('0' + (timeLeft % 60)).slice(-2)}`;
+  const timeClass = timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-blue-400';
+  const headerText = isSpecial ? 'CÂU HỎI ĐẶC BIỆT' : 'CÂU HỎI';
+  const headerColor = isSpecial ? 'text-yellow-400' : 'text-blue-400';
+
+
+  // GIAO DIỆN CÂU HỎI TRẮC NGHIỆM
+  return (
+    <div className="w-full max-w-3xl mx-auto p-8 bg-gray-800/95 rounded-2xl shadow-2xl border border-blue-500/30">
+      
+      <div className="flex justify-between items-center mb-6">
+        <button 
+            onClick={() => dispatch({ type: 'RETURN_TO_WHEEL' })}
+            className="flex items-center text-gray-400 hover:text-white transition duration-200"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 mr-1">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Về Vòng Quay
+        </button>
+        <p className="text-md text-gray-400 font-semibold">Lượt thử: {state.playerAttempts + 1} / 2</p>
+      </div>
+
+      <div className="text-center mb-6 border-b border-gray-700 pb-4">
+          <p className={`text-xl font-bold ${timeClass}`}>
+             <span className="inline-block w-4 h-4 rounded-full bg-blue-600 mr-2 animate-ping"></span>
+             Thời gian còn lại: {formattedTime}
+          </p>
+          <h2 className={`text-xl font-extrabold uppercase mt-2 ${headerColor}`}>{headerText}</h2>
+          <h1 className="text-3xl font-extrabold text-white mt-2 leading-relaxed">{currentQuestion.question}</h1>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        {currentQuestion.options.map((option, index) => {
+          const isSelected = selectedOption === index;
+          const isCorrectAnswer = index === currentQuestion.correct;
+          
+          let buttonClass = "bg-gray-700 hover:bg-gray-600 border-gray-600";
+          let icon = null;
+
+          if (state.showResult) {
+            // Khi đã có kết quả
+            if (isCorrectAnswer) {
+              buttonClass = "bg-green-600 border-green-400 shadow-lg shadow-green-700/50";
+              icon = <span className="ml-3 text-2xl">✅</span>;
+            } else if (isSelected) {
+              buttonClass = "bg-red-600 border-red-400 shadow-lg shadow-red-700/50 opacity-70";
+              icon = <span className="ml-3 text-2xl">❌</span>;
+            }
+          } else if (isSelected) {
+              // Khi đang chọn nhưng chưa nộp
+              buttonClass = "bg-blue-600 border-blue-400 ring-2 ring-blue-400";
+          }
+          
+          return (
+            <button 
+              key={index}
+              onClick={() => handleAnswer(index)}
+              disabled={state.showResult || state.playerAttempts >= 2}
+              className={`p-4 text-left rounded-xl text-lg font-semibold border-2 transition-all duration-300 flex items-center justify-between ${buttonClass} disabled:cursor-not-allowed disabled:opacity-90`}
+            >
+              <span className="flex-grow">{option}</span>
+              {icon}
+            </button>
+          );
+        })}
+      </div>
+      
+      {state.playerAttempts > 0 && state.lastAnswer === 'incorrect' && !state.showResult && (
+          <p className="mt-4 text-center text-red-400 font-semibold text-lg animate-pulse">
+              SAI! Bạn còn 1 lượt thử cuối. Hãy cẩn thận!
+          </p>
+      )}
+    </div>
+  );
+};
+
+
+// Component giả lập màn hình Wheel
+const WheelScreen: React.FC = () => {
+    const { state, dispatch } = useGame();
+    
+    // Logic chọn ngẫu nhiên một câu hỏi chưa làm
+    const startRandomQuestion = () => {
+        const availableQuestions = state.questions.filter(
+            q => !state.selectedQuestions.includes(q.id)
+        );
+
+        if (availableQuestions.length === 0) {
+            console.log('Đã hoàn thành hết tất cả câu hỏi!');
+            return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+        const nextQuestion = availableQuestions[randomIndex];
+
+        // Giả lập chọn ghế (Seat)
+        const seat = state.availableSeats[Math.floor(Math.random() * state.availableSeats.length)];
+        
+        dispatch({ type: 'SELECT_SEAT', payload: seat });
+        dispatch({ type: 'START_QUESTION', payload: nextQuestion });
+    };
+
+    return (
+        <div className="text-center p-12 bg-gradient-to-br from-blue-900/80 to-indigo-900/80 rounded-2xl shadow-2xl border-4 border-blue-500/50">
+            <h1 className="text-5xl font-black text-white mb-6 tracking-wider">
+                WILLPOWER GAME SHOW
+            </h1>
+            <p className="text-2xl text-yellow-300 mb-8 font-semibold">
+                Ghế được chọn: <span className="text-red-400 font-extrabold">{state.selectedSeat || 'N/A'}</span>
+            </p>
+            <div className="text-gray-300 mb-8 border-t border-b border-gray-700 py-3">
+                <p className="text-lg">
+                    Tiến độ: <span className="font-bold text-green-400">{state.selectedQuestions.length}</span> / {state.questions.length} câu
+                </p>
+                <p className="text-sm mt-1">
+                    Số ghế khả dụng: {state.availableSeats.length} / {state.maxSeats}
+                </p>
+            </div>
+            <button
+                onClick={startRandomQuestion}
+                className="px-10 py-4 text-2xl font-black text-white bg-gradient-to-r from-red-600 to-pink-600 rounded-full shadow-2xl transition duration-300 hover:from-red-700 hover:to-pink-700 transform hover:scale-105 animate-pulse-slow"
+            >
+                <span className="relative z-10">QUAY VÀO GHẾ MAY MẮN</span>
+                <span className="absolute inset-0 rounded-full opacity-30 bg-white blur-sm"></span>
+            </button>
+        </div>
+    );
+};
+
+// Component giả lập màn hình Setup
+const SetupScreen: React.FC = () => {
+    const { dispatch } = useGame();
+    const [maxSeatsInput, setMaxSeatsInput] = useState(60);
+
+    const handleStart = () => {
+        dispatch({ type: 'SET_MAX_SEATS', payload: maxSeatsInput });
+        dispatch({ type: 'START_GAME' });
+    };
+
+    return (
+        <div className="p-10 bg-gray-800 rounded-xl shadow-2xl border-t-4 border-yellow-500">
+            <h1 className="text-3xl font-bold text-yellow-400 mb-6">THIẾT LẬP TRÒ CHƠI</h1>
+            <label className="block mb-6 text-white text-lg font-medium">
+                Số lượng Ghế tham gia tối đa:
+                <input
+                    type="number"
+                    value={maxSeatsInput}
+                    onChange={(e) => setMaxSeatsInput(parseInt(e.target.value) || 1)}
+                    min="1"
+                    className="mt-2 w-full p-3 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-yellow-500 focus:border-yellow-500"
+                />
+            </label>
+            <button
+                onClick={handleStart}
+                className="w-full py-3 bg-green-500 text-white font-bold text-xl rounded-lg hover:bg-green-600 transition shadow-lg"
+            >
+                BẮT ĐẦU VÒNG QUAY
+            </button>
+        </div>
+    );
+};
+
+
+// Component hiển thị nội dung chính của Game (Sau khi đã có Context)
+const MainGameContent = () => {
+  const { state } = useGame();
+
+  let ScreenComponent;
+  switch (state.currentScreen) {
+    case 'setup':
+      ScreenComponent = SetupScreen;
+      break;
+    case 'wheel':
+      ScreenComponent = WheelScreen;
+      break;
+    case 'questions':
+      ScreenComponent = QuestionScreen;
+      break;
+    default:
+      // Fallback
+      ScreenComponent = SetupScreen;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-4 font-sans">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <style>{`
+        /* Custom Keyframes for better animation */
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 3s infinite;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+      `}</style>
+      <ScreenComponent />
+    </div>
+  );
+};
+
+
+// Component chính được export mặc định
+export default function App() {
+    return (
+        <GameProvider>
+            <MainGameContent />
+        </GameProvider>
+    );
+}
